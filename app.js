@@ -21,6 +21,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
+passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
@@ -30,12 +31,12 @@ app.get('/', (req, res) => {
     res.render('home')
 })
 
-app.get('/register', (req, res) => {
-    res.render('register')
-})
-
 app.get('/secret', (req, res) => {
     res.render('secret')
+})
+
+app.get('/register', (req, res) => {
+    res.render('register')
 })
 
 app.post('/register', (req, res) => {
@@ -54,6 +55,17 @@ app.post('/register', (req, res) => {
         }
     } )
 })
+
+app.get('/login', (req, res) => {
+    res.render('login')
+})
+
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/secret',
+    failureRedirect: '/login'
+}), (req, res) => {
+})
+
 
 app.listen(5000, () => {
     console.log('Server started on port 5000...')
