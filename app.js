@@ -19,15 +19,40 @@ app.use(require('express-session')({
 app.set('view engine', 'ejs')
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
+
+// routes
 
 app.get('/', (req, res) => {
     res.render('home')
 })
 
+app.get('/register', (req, res) => {
+    res.render('register')
+})
+
 app.get('/secret', (req, res) => {
     res.render('secret')
+})
+
+app.post('/register', (req, res) => {
+    // handle user sign up
+    let username = req.body.username
+    let password = req.body.password
+
+    User.register(new User({ username: username}), password, (err, user) => {
+        if (err) {
+            console.log(err)
+            res.render('register')
+        } else {
+            passport.authenticate('local')(req, res, () => {
+                res.redirect('/secret')
+            })
+        }
+    } )
 })
 
 app.listen(5000, () => {
